@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaSignal AI — Next-Gen Trading Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0b0e;
+            --bg-surface: #111318;
+            --bg-card: #16181e;
+            --bg-card-hover: #1c1f26;
+            --border: #1e2129;
+            --text-primary: #e8eaed;
+            --text-secondary: #8b8f97;
+            --text-muted: #5c5f66;
+            --accent: #00d4aa;
+            --accent-glow: rgba(0,212,170,0.15);
+            --accent-dim: rgba(0,212,170,0.08);
+            --profit: #00d4aa;
+            --loss: #ff4757;
+            --signal-buy: #00d4aa;
+            --signal-sell: #ff4757;
+            --bar-bg: #1a1d24;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a2d35; border-radius: 3px; }
+
+        /* Grid Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(10,11,14,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .nav-logo .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), #00a0ff);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--accent), #00a0ff);
+            color: #000 !important;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600 !important;
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 140px 2rem 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(0,212,170,0.25);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span.gradient {
+            background: linear-gradient(135deg, var(--accent), #00a0ff, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #00a0ff);
+            color: #000;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,212,170,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            border-color: var(--text-secondary);
+            background: var(--bg-card);
+        }
+
+        /* Live Dashboard */
+        .dashboard {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 60px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .live-indicator .dot {
+            width: 8px; height: 8px;
+            background: var(--profit);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-card .change {
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .change.profit { color: var(--profit); }
+        .change.loss { color: var(--loss); }
+
+        /* Signal Cards */
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .signal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signal-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px;
+            height: 100%;
+            transition: all 0.3s;
+        }
+
+        .signal-card.buy::before { background: var(--signal-buy); }
+        .signal-card.sell::before { background: var(--signal-sell); }
+
+        .signal-card:hover {
+            border-color: #2a2d35;
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .signal-card .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .signal-card .signal-pair {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .signal-card .signal-type {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .signal-type.buy {
+            background: rgba(0,212,170,0.12);
+            color: var(--signal-buy);
+        }
+
+        .signal-type.sell {
+            background: rgba(255,71,87,0.12);
+            color: var(--signal-sell);
+        }
+
+        .signal-card .signal-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .signal-card .signal-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .signal-card .signal-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .signal-card .signal-confidence {
+            margin-top: 12px;
+            height: 4px;
+            background: var(--bar-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .signal-card .signal-confidence .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        .signal-card.buy .fill { background: var(--signal-buy); }
+        .signal-card.sell .fill { background: var(--signal-sell); }
+
+        /* Features Section */
+        .features {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 2rem;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 48px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: #2a2d35;
+            transform: translateY(-4px);
+        }
+
+        .feature-card .icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card .icon.ai { background: rgba(0,212,170,0.12); }
+        .feature-card .icon.real { background: rgba(99,102,241,0.12); }
+        .feature-card .icon.risk { background: rgba(255,71,87,0.12); }
+        .feature-card .icon.api { background: rgba(255,193,7,0.12); }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* How it works */
+        .how-it-works {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 2rem;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 48px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            counter-reset: step;
+        }
+
+        .step {
+            text-align: center;
+            padding: 32px 20px;
+        }
+
+        .step .step-number {
+            width: 48px; height: 48px;
+            margin: 0 auto 16px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(0,212,170,0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+
+        .step h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 260px;
+            margin: 0 auto;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 2rem;
+            text-align: center;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,160,255,0.08));
+            border: 1px solid rgba(0,212,170,0.2);
+            border-radius: 20px;
+            padding: 60px 40px;
+        }
+
+        .cta-box h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-box p {
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .signal-card { animation: fadeInUp 0.5s ease forwards; }
+        .signal-card:nth-child(1) { animation-delay: 0.05s; }
+        .signal-card:nth-child(2) { animation-delay: 0.1s; }
+        .signal-card:nth-child(3) { animation-delay: 0.15s; }
+        .signal-card:nth-child(4) { animation-delay: 0.2s; }
+        .signal-card:nth-child(5) { animation-delay: 0.25s; }
+        .signal-card:nth-child(6) { animation-delay: 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            nav { padding: 0 1rem; }
+            .nav-links { display: none; }
+            .hero { padding: 120px 1rem 60px; }
+            .dashboard, .features, .how-it-works, .cta-section { padding-left: 1rem; padding-right: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .cta-box { padding: 40px 20px; }
+        }
+
+        /* Backtest Results Mini Chart */
+        .mini-chart {
+            margin-top: 12px;
+            height: 40px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .mini-chart .bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            background: var(--accent);
+            opacity: 0.3;
+            transition: all 0.3s;
+        }
+
+        .mini-chart .bar.active { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+    <div class="nav-logo">
+        <div class="logo-icon">▲</div>
+        NovaSignal
+    </div>
+    <div class="nav-links">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#cta" class="nav-cta">Get Early Access</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-badge">
+        <span class="dot"></span>
+        Live Trading Intelligence
+    </div>
+    <h1>
+        Trade Smarter with<br>
+        <span class="gradient">AI-Powered Signals</span>
+    </h1>
+    <p>
+        Real-time multi-market analysis powered by machine learning. 
+        NovaSignal processes 500K+ data points per second to deliver 
+        high-confidence trading signals across crypto, forex, and indices.
+    </p>
+    <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">
+            Start Free Trial →
+        </button>
+        <button class="btn-outline" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">
+            View Live Demo
+        </button>
+    </div>
+</section>
+
+<!-- Live Dashboard -->
+<section class="dashboard" id="dashboard">
+    <div class="dashboard-header">
+        <h2>⚡ Live Signals Dashboard</h2>
+        <div class="live-indicator">
+            <span class="dot"></span>
+            Real-time data · Updating every 5s
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">Win Rate (24h)</div>
+            <div class="value" id="winRate">94.2%</div>
+            <div class="change profit">↑ 2.1% vs yesterday</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Total Signals</div>
+            <div class="value" id="totalSignals">1,847</div>
+            <div class="change profit">↑ 342 today</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Avg. Return / Trade</div>
+            <div class="value" id="avgReturn">+2.8%</div>
+            <div class="change profit">↑ 0.3% this week</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Active Subscribers</div>
+            <div class="value" id="subscribers">12,439</div>
+            <div class="change profit">↑ 892 this month</div>
+        </div>
+    </div>
+
+    <div class="signals-grid" id="signalsGrid"></div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+    <h2>Why NovaSignal</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="icon ai">🧠</div>
+            <h3>AI-Powered Analysis</h3>
+            <p>Multi-layer neural network analyzing price action, order flow, on-chain data, and market sentiment simultaneously.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon real">⚡</div>
+            <h3>Real-Time Execution</h3>
+            <p>Sub-100ms signal delivery via WebSocket. Never miss a trade entry or exit window again.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon risk">🛡️</div>
+            <h3>Risk-First Approach</h3>
+            <p>Every signal comes with position sizing, stop-loss, and take-profit recommendations built-in.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon api">🔌</div>
+            <h3>API & Webhook</h3>
+            <p>Integrate directly with your existing trading bots. REST API and webhook support for all major exchanges.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works" id="how">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Connect Exchange</h3>
+            <p>Link your exchange account via API key with read-only permissions. Your funds stay safe.</p>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>AI Analyzes</h3>
+            <p>Our models process 500K+ data points per second across 47+ indicators and 7 timeframes.</p>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Get Signals</h3>
+            <p>Receive clear buy/sell signals with confidence scores, entry prices, and risk parameters.</p>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <h3>Execute & Profit</h3>
+            <p>Manual or auto-execute trades. Track performance with detailed analytics.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+    <div class="cta-box">
+        <h2>Ready to Level Up?</h2>
+        <p>Join 12,000+ traders using NovaSignal. Start with a 7-day free trial — no credit card required.</p>
+        <button class="btn-primary" onclick="alert('🚀 Beta launch coming soon! Enter your email at the bottom to get early access.')">
+            Get Early Access →
+        </button>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>© 2026 NovaSignal AI. All rights reserved. · Trading involves risk — past performance does not guarantee future results.</p>
+</footer>
+
+<script>
+    // ============================================================
+    // SIMULATED LIVE SIGNALS — Replace with real API data
+    // ============================================================
+
+    const PAIRS = [
+        { pair: 'BTC/USD', basePrice: 87650, spread: 350, type: 'Crypto' },
+        { pair: 'ETH/USD', basePrice: 4120, spread: 120, type: 'Crypto' },
+        { pair: 'SOL/USD', basePrice: 178.50, spread: 8.5, type: 'Crypto' },
+        { pair: 'XRP/USD', basePrice: 2.84, spread: 0.12, type: 'Crypto' },
+        { pair: 'EUR/USD', basePrice: 1.0825, spread: 0.003, type: 'Forex' },
+        { pair: 'GBP/USD', basePrice: 1.2840, spread: 0.004, type: 'Forex' },
+        { pair: 'XAU/USD', basePrice: 2350.00, spread: 18.00, type: 'Commodities' },
+        { pair: 'AAPL', basePrice: 198.40, spread: 3.2, type: 'Stocks' },
+        { pair: 'TSLA', basePrice: 245.60, spread: 5.8, type: 'Stocks' },
+        { pair: 'DOGE/USD', basePrice: 0.185, spread: 0.012, type: 'Crypto' },
+        { pair: 'NVDA', basePrice: 880.00, spread: 15.00, type: 'Stocks' },
+        { pair: 'BNB/USD', basePrice: 610.50, spread: 14.00, type: 'Crypto' }
+    ];
+
+    const signalsGrid = document.getElementById('signalsGrid');
+    const winRateEl = document.getElementById('winRate');
+    const totalSignalsEl = document.getElementById('totalSignals');
+    const avgReturnEl = document.getElementById('avgReturn');
+    const subscribersEl = document.getElementById('subscribers');
+
+    let totalSignals = 1847;
+    let wins = 1740;
+    let totalTrades = 1847;
+
+    function randomBetween(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function generateSignal(pairData) {
+        const isBuy = Math.random() > 0.45;
+        const confidence = randomBetween(72, 98);
+        const priceVariation = randomBetween(-pairData.spread, pairData.spread);
+        const price = pairData.basePrice + priceVariation;
+        const strength = confidence > 88 ? 'Strong' : confidence > 78 ? 'Moderate' : 'Low';
+
+        return {
+            pair: pairData.pair,
+            type: pairData.type,
+            signal: isBuy ? 'BUY' : 'SELL',
+            price: price,
+            confidence: confidence,
+            strength: strength,
+            timestamp: new Date().toLocaleTimeString()
+        };
+    }
+
+    function renderSignals() {
+        const signals = PAIRS.map(p => generateSignal(p));
+
+        signalsGrid.innerHTML = signals.map(s => {
+            const signalClass = s.signal === 'BUY' ? 'buy' : 'sell';
+            const confidenceClass = s.signal === 'BUY' ? 'profit' : 'loss';
+            return `
+                <div class="signal-card ${signalClass}">
+                    <div class="signal-header">
+                        <span class="signal-pair">${s.pair}</span>
+                        <span class="signal-type ${signalClass}">${s.signal}</span>
+                    </div>
+                    <div class="signal-price">$${s.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    <div class="signal-meta">
+                        <span>🎯 ${s.strength}</span>
+                        <span>📊 ${s.type}</span>
+                        <span>🕐 ${s.timestamp}</span>
+                    </div>
+                    <div class="signal-confidence">
+                        <div class="fill" style="width: ${s.confidence}%"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function updateStats() {
+        totalSignals += Math.floor(randomBetween(1, 4));
+        totalTrades += Math.floor(randomBetween(1, 3));
+        if (Math.random() > 0.06) { wins += 1; }
+        const winRate = ((wins / totalTrades) * 100).toFixed(1);
+        const avgRet = randomBetween(1.8, 3.8).toFixed(1);
+
+        winRateEl.textContent = winRate + '%';
+        totalSignalsEl.textContent = totalSignals.toLocaleString();
+        avgReturnEl.textContent = '+' + avgRet + '%';
+
+        // Subscribers slow growth
+        const curr = parseInt(subscribersEl.textContent.replace(/,/g, ''));
+        if (Math.random() > 0.3) {
+            subscribersEl.textContent = (curr + Math.floor(randomBetween(1, 5))).toLocaleString();
+        }
+    }
+
+    function refresh() {
+        renderSignals();
+        updateStats();
+    }
+
+    // Initial render
+    refresh();
+
+    // Update every 5 seconds
+    setInterval(refresh, 5000);
+</script>
+</body>
+</html>
